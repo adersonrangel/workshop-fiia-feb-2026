@@ -6,8 +6,8 @@ Proyecto para workshop de Fundamentos Ingeniería IA (FIIA).
 ## Sesiones
 
 - Sesión 1 - Los cimientos: APIs, LLMs y Testing
-- Sesión 2 - RAG (Retrieval Augmented Generation
-- Sesión 3 - Agentes](03-agents/README.md
+- Sesión 2 - RAG (Retrieval Augmented Generation)
+- Sesión 3 - Agentes
 - Sesión 4 - Automatización con Low-Code
 
 ## 📄 License
