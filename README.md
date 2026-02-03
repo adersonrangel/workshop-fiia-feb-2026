@@ -5,7 +5,7 @@
 
 ## Sesiones
 
-- Sesión 1 - Los cimientos: APIs, LLMs y Testing
+- [Sesión 1 - Los cimientos: APIs, LLMs y Testing](01-intro-llms/README.md)
 - Sesión 2 - RAG (Retrieval Augmented Generation)
 - Sesión 3 - Agentes
 - Sesión 4 - Automatización con Low-Code

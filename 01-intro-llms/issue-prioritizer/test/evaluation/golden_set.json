@@ -1,0 +1,34 @@
+[
+  {
+    "input": {
+      "issue_id": "TEST-001",
+      "title": "Vulnerabilidad de inyección SQL en formulario de login",
+      "description": "Auditoría de seguridad encontró vulnerabilidad de inyección SQL en el formulario de login. Un atacante podría potencialmente acceder a toda la base de datos usando entrada manipulada."
+    },
+    "expected_priority": "Urgente"
+  },
+  {
+    "input": {
+      "issue_id": "TEST-002",
+      "title": "El modo oscuro no persiste la preferencia",
+      "description": "Cuando el usuario selecciona modo oscuro y recarga la página, vuelve al modo claro. La preferencia del usuario no se está guardando."
+    },
+    "expected_priority": "Baja"
+  },
+  {
+    "input": {
+      "issue_id": "TEST-003",
+      "title": "Timeout de pasarela de pago causando transacciones fallidas",
+      "description": "Múltiples usuarios reportando fallos de pago debido a errores de timeout. Las transacciones están siendo rechazadas pero los usuarios no son notificados correctamente. Esto está afectando aproximadamente al 30% de los intentos de checkout."
+    },
+    "expected_priority": "Alta"
+  },
+  {
+    "input": {
+      "issue_id": "TEST-004",
+      "title": "La paginación de resultados de búsqueda muestra conteo incorrecto",
+      "description": "El conteo total mostrado en la paginación de resultados de búsqueda es incorrecto. Muestra 100 resultados pero solo hay 50. Existe solución alternativa funcional desplazándose por los resultados."
+    },
+    "expected_priority": "Media"
+  }
+]
