@@ -1,0 +1,35 @@
+# Application Configuration
+app:
+  name: "Tech Docs Explorer"
+  debug: false
+
+# Indexing Configuration
+indexing:
+  chunk_size: 1000
+  chunk_overlap: 200
+
+# RAG Configuration
+rag:
+  default_top_k: 5
+  default_threshold: 0.5
+  hyde_enabled: false
+  reranking_enabled: false
+
+# LLM Provider Configuration
+llm:
+  provider: "openai"
+
+# Pricing Configuration (USD per 1M tokens)
+# Update these values when changing models in .env
+pricing:
+  llm_model:
+    name: "gpt-4o-mini"
+    input_per_1m: 0.15
+    output_per_1m: 0.60
+  embedding_model:
+    name: "text-embedding-3-small"
+    input_per_1m: 0.02
+  rerank_model:
+    name: "gpt-4o-mini"
+    input_per_1m: 0.15
+    output_per_1m: 0.60

@@ -6,7 +6,7 @@
 ## Sesiones
 
 - [Los cimientos: LLMs, Arquitectura y Testing](intro-llms/README.md)
-- RAG (Retrieval Augmented Generation)
+- [RAG (Retrieval Augmented Generation)](rag/README.md)
 - Agentes
 - Automatización con Low-Code
 

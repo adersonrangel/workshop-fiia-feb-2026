@@ -1,0 +1,19 @@
+[client]
+# Disable the toolbar at the top
+toolbarMode = "minimal"
+
+[runner]
+# Faster re-runs
+fastReruns = true
+
+[server]
+# Disable file watcher warnings
+fileWatcherType = "poll"
+
+[theme]
+# Optional: Uncomment to customize theme
+# primaryColor = "#F63366"
+# backgroundColor = "#FFFFFF"
+# secondaryBackgroundColor = "#F0F2F6"
+# textColor = "#262730"
+# font = "sans serif"
