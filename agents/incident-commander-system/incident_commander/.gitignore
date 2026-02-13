@@ -1,0 +1,16 @@
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ADK
+.adk/
+
+# Generated reports (keep directory, ignore content except .gitkeep)
+reports/*
+!reports/.gitkeep

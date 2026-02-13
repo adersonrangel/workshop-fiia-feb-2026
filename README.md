@@ -7,7 +7,7 @@
 
 - [Los cimientos: LLMs, Arquitectura y Testing](intro-llms/README.md)
 - [RAG (Retrieval Augmented Generation)](rag/README.md)
-- Agentes
+- [Agentes](agents/README.md)
 - Automatización con Low-Code
 
 ## 👨‍🏫 Instructores
