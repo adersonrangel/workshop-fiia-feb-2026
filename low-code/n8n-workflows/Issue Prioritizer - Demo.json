@@ -1,0 +1,250 @@
+{
+  "name": "Issue Prioritizer - Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "issue-prioritizer",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a55a14e9-127d-4d0a-9370-ebc7c1d10c79",
+      "name": "Webhook",
+      "webhookId": "5ed3288d-2203-4776-b9fc-83b3fe9d6239"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analiza este issue:\n\n**ID**: {{ $json.body.issue_id }}\n**Título**: {{ $json.body.title }}\n**Descripción**: {{ $json.body.description }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Eres un experto en gestión de proyectos de software especializado en triaje y priorización de issues. Tu tarea es analizar issues de software y asignarles un nivel de prioridad basado en su impacto, urgencia y alcance.\n\n## Herramientas Disponibles\n\n### Knowledge Base\nTienes acceso a una base de conocimiento con documentación interna del equipo:\n- Políticas oficiales de triaje con SLAs y protocolos de respuesta\n- Catálogo de servicios con niveles de criticidad (Tier 1, 2, 3)\n- Guía de respuesta a incidentes de seguridad\n\n**SIEMPRE consulta la Knowledge Base antes de asignar una prioridad.** Úsala para:\n1. Verificar si el servicio mencionado en el issue tiene un nivel de criticidad definido\n2. Confirmar los criterios oficiales de prioridad y SLAs aplicables\n3. Identificar si existen reglas de escalación automática para el tipo de issue\n4. Obtener los protocolos de respuesta recomendados\n\n### Service Status\nTienes acceso a una herramienta que consulta el estado actual de los servicios en producción. Devuelve status (healthy, degraded, down), tiempos de respuesta, y detalles de incidentes activos.\n\n**Consulta el Service Status cuando el issue mencione:**\n- Servicios que no responden, timeouts, o errores de conexión\n- Degradación de rendimiento o lentitud\n- Funcionalidades que dejaron de funcionar repentinamente\n- Problemas que podrían estar relacionados con la infraestructura\n\nEsto te permite confirmar si el problema es un incidente activo conocido o un caso aislado, lo cual cambia significativamente la prioridad.\n\n## Niveles de Prioridad\n\n- **Urgente**: Vulnerabilidades de seguridad, caídas de producción, riesgos de pérdida de datos, impacto crítico al negocio\n- **Alta**: Funcionalidad crítica rota, muchos usuarios afectados, impacto significativo al negocio, sin solución alternativa disponible\n- **Media**: Funcionalidad secundaria afectada, solución alternativa disponible, impacto moderado a usuarios\n- **Baja**: Mejoras menores, bugs cosméticos, actualizaciones de documentación, características deseables pero no esenciales\n\n## Directrices\n\n1. Consulta la Knowledge Base para cada issue — no asumas la prioridad sin verificar\n2. Si el issue menciona un servicio específico, busca su nivel de criticidad en el catálogo Y consulta su estado actual en Service Status\n3. Si el issue involucra seguridad o datos sensibles, busca los protocolos de respuesta a incidentes\n4. Si falta contexto para clasificar con confianza, asigna \"Media\" y explica qué información falta\n5. No te bases solo en tu conocimiento general. La documentación interna tiene criterios específicos de este equipo.\n6. Sé consistente: mismos criterios, mismas prioridades"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        464,
+        0
+      ],
+      "id": "ce50ab91-8d51-4d17-b705-00dfa0fce124",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        224
+      ],
+      "id": "0b6c30a8-dfce-49f0-b11c-977d3ebc40e2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "UOIa68TrRgbGKYtZ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        432
+      ],
+      "id": "b2fe07ab-5323-48a6-9104-d3f102eb128f",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "UOIa68TrRgbGKYtZ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Base de conocimiento con políticas de triaje de issues y documentación del equipo. Úsala para fundamentar tus decisiones de priorización.",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "01fb9bde-9006-49ed-baa8-5ba1abcca575",
+      "name": "Knowledge Base"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Consulta el status actual de los servicios del sistema. Puedes pasar el nombre del servicio como parámetro (ej: payment-service, auth-service, notification-service). Si no pasas parámetro, devuelve el status de todos los servicios. Usa esta herramienta cuando el issue mencione problemas de disponibilidad, timeouts, errores de conexión, o servicios que no responden.",
+        "url": "http://localhost:5678/webhook/service-status",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "service",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        640,
+        224
+      ],
+      "id": "b6b861c8-c4ea-45c1-b037-4bb2cf619530",
+      "name": "Get Service Status"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        992,
+        0
+      ],
+      "id": "fad3de24-a569-417f-b23b-cf6939a6abf1",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"priority\": {\n      \"type\": \"string\",\n      \"enum\": [\"Urgente\", \"Alta\", \"Media\", \"Baja\"],\n      \"description\": \"Nivel de prioridad asignado al issue\"\n    },\n    \"reasoning\": {\n      \"type\": \"string\",\n      \"description\": \"Explicación de 2-4 oraciones fundamentando la prioridad, incluyendo lo encontrado en la Knowledge Base\"\n    },\n    \"confidence\": {\n      \"type\": \"number\",\n      \"description\": \"Nivel de confianza en la evaluación, de 0.0 a 1.0\"\n    },\n    \"impact_areas\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Áreas afectadas por el issue (ej: seguridad, experiencia-usuario, rendimiento, integridad-datos)\"\n    },\n    \"protocol\": {\n      \"type\": \"string\",\n      \"description\": \"Acción recomendada según la documentación interna\"\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        816,
+        224
+      ],
+      "id": "bb746113-7dfc-4eee-a57b-75694300c67b",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Knowledge Base",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge Base": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Service Status": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a39f6e14-1f3b-4332-a3fc-1f1889898d4f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "95c438d46dcc6773633158566bc93a3a653aebdc77ce5825d953bea5860238f6"
+  },
+  "id": "zQFUnTVRmz8gL2EZ",
+  "tags": []
+}

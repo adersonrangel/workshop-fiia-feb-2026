@@ -1,0 +1,115 @@
+{
+  "name": "Service Status",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "service-status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d2b34622-df26-4e51-8951-a23a789780e9",
+      "name": "Webhook",
+      "webhookId": "6ff09b84-259a-41eb-af35-df1ef920fdb2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Base de datos simulada de status de servicios\n// Alineada con el Catálogo de Servicios (02-catalogo-servicios.md)\nconst serviceStatus = {\n  \"api-gateway\": {\n    name: \"API Gateway\",\n    tier: 1,\n    status: \"healthy\",\n    uptime_percent: 99.99,\n    last_incident: null,\n    response_time_ms: 45\n  },\n  \"auth-service\": {\n    name: \"Auth Service\",\n    tier: 1,\n    status: \"healthy\",\n    uptime_percent: 99.98,\n    last_incident: \"2025-01-15T08:30:00Z\",\n    response_time_ms: 120\n  },\n  \"payment-service\": {\n    name: \"Payment Service\",\n    tier: 1,\n    status: \"down\",\n    uptime_percent: 97.2,\n    last_incident: \"2025-02-12T15:00:00Z\",\n    incident_description: \"Stripe webhook endpoint no responde. Transacciones encoladas desde las 15:00. Tasa de error actual: 78%.\",\n    response_time_ms: null,\n    estimated_recovery: \"En investigación\"\n  },\n  \"user-database\": {\n    name: \"User Database (PostgreSQL Primary)\",\n    tier: 1,\n    status: \"healthy\",\n    uptime_percent: 99.99,\n    last_incident: null,\n    response_time_ms: 8\n  },\n  \"notification-service\": {\n    name: \"Notification Service\",\n    tier: 2,\n    status: \"degraded\",\n    uptime_percent: 98.5,\n    last_incident: \"2025-02-12T14:20:00Z\",\n    incident_description: \"SendGrid reporta latencia elevada. Emails transaccionales con retraso de 5-15 minutos. Push notifications funcionando normal.\",\n    response_time_ms: 3200,\n    estimated_recovery: \"Dependiente de SendGrid\"\n  },\n  \"search-service\": {\n    name: \"Search Service\",\n    tier: 2,\n    status: \"healthy\",\n    uptime_percent: 99.85,\n    last_incident: \"2025-02-01T11:00:00Z\",\n    response_time_ms: 230\n  },\n  \"analytics-service\": {\n    name: \"Analytics Service\",\n    tier: 2,\n    status: \"healthy\",\n    uptime_percent: 99.4,\n    last_incident: null,\n    response_time_ms: 890\n  },\n  \"file-storage\": {\n    name: \"File Storage Service\",\n    tier: 2,\n    status: \"healthy\",\n    uptime_percent: 99.91,\n    last_incident: null,\n    response_time_ms: 65\n  },\n  \"ci-cd-pipeline\": {\n    name: \"CI/CD Pipeline\",\n    tier: 3,\n    status: \"healthy\",\n    uptime_percent: 99.1,\n    last_incident: \"2025-02-10T09:00:00Z\",\n    response_time_ms: null\n  },\n  \"admin-panel\": {\n    name: \"Internal Admin Panel\",\n    tier: 3,\n    status: \"healthy\",\n    uptime_percent: 99.5,\n    last_incident: null,\n    response_time_ms: 340\n  }\n};\n\n// Obtener el servicio solicitado\nconst query = $json.query || {};\nconst serviceName = (query.service || \"\").toLowerCase().trim();\n\n// Si no se especificó servicio, devolver todos\nif (!serviceName) {\n  const summary = Object.entries(serviceStatus).map(([key, s]) => ({\n    service_id: key,\n    name: s.name,\n    tier: s.tier,\n    status: s.status\n  }));\n\n  return {\n    timestamp: new Date().toISOString(),\n    total_services: summary.length,\n    services_down: summary.filter(s => s.status === \"down\").length,\n    services_degraded: summary.filter(s => s.status === \"degraded\").length,\n    services: summary\n  };\n}\n\n// Buscar servicio específico\nconst service = serviceStatus[serviceName];\n\nif (!service) {\n  // Buscar por nombre parcial\n  const match = Object.entries(serviceStatus).find(([key, s]) =>\n    key.includes(serviceName) ||\n    s.name.toLowerCase().includes(serviceName)\n  );\n\n  if (match) {\n    return {\n      timestamp: new Date().toISOString(),\n      service_id: match[0],\n      ...match[1]\n    };\n  }\n\n  return {\n    timestamp: new Date().toISOString(),\n    error: \"Servicio no encontrado\",\n    available_services: Object.keys(serviceStatus),\n    suggestion: \"Usa uno de los service IDs listados arriba\"\n  };\n}\n\nreturn {\n  timestamp: new Date().toISOString(),\n  service_id: serviceName,\n  ...service\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c267b127-9d7b-4bee-8c22-bdd4fe8da51d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        416,
+        0
+      ],
+      "id": "8c445291-1372-4e2c-9586-7112b6d3e655",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "accept": "application/json, text/plain, */*",
+            "content-type": "application/json",
+            "user-agent": "bruno-runtime/3.0.2",
+            "request-start-time": "1771102025467",
+            "content-length": "196",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "host": "localhost:5678",
+            "connection": "keep-alive"
+          },
+          "params": {},
+          "query": {
+            "service": "payment-service"
+          },
+          "body": {
+            "issue_id": "TEST-001",
+            "title": "Botón de login no funciona",
+            "description": "Los usuarios reportan que el botón de login no responde al hacer click. Afecta Chrome y Firefox."
+          },
+          "webhookUrl": "http://localhost:5678/webhook-test/service-status",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c523ddf7-23b0-4c0e-af0c-6833f854b118",
+  "meta": {
+    "instanceId": "95c438d46dcc6773633158566bc93a3a653aebdc77ce5825d953bea5860238f6"
+  },
+  "id": "rsGXLIhagDgo8mjU",
+  "tags": []
+}
